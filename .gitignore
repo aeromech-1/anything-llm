@@ -10,3 +10,7 @@ aws_cf_deploy_anything_llm.json
 yarn.lock
 *.bak
 .idea
+docker/anythingllm.tar
+
+# Personal documentation
+personal_docs/

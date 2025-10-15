@@ -5,7 +5,33 @@ import Appearance from "@/models/appearance";
 import hljs from "highlight.js";
 import "./themes/github-dark.css";
 import "./themes/github.css";
+import "katex/dist/katex.min.css";
 import { v4 } from "uuid";
+
+// Inject custom KaTeX styling for better alignment and display
+if (typeof document !== 'undefined') {
+  const style = document.createElement('style');
+  style.textContent = `
+    .katex-block {
+      margin: 1em 0;
+      text-align: center;
+    }
+    .katex-block .katex-display {
+      margin: 0;
+    }
+    .katex {
+      font-size: 1.1em;
+    }
+    .katex-error {
+      color: #cc0000;
+      border: 1px solid #cc0000;
+      padding: 0.2em;
+      border-radius: 3px;
+      background: rgba(204, 0, 0, 0.1);
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 const markdown = markdownIt({
   html: Appearance.get("renderHTML") ?? false,

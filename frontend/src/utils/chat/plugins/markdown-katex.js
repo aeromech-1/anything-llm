@@ -227,22 +227,27 @@ function math_block(state, start, end, silent) {
 }
 
 export default function math_plugin(md, options) {
-  // Default options
+  // Default options with better error handling and rendering
   options = options || {};
+  const defaultOptions = {
+    throwOnError: false,
+    errorColor: '#cc0000',
+    strict: 'warn',
+    trust: false,
+    ...options
+  };
 
   var katexInline = function (latex) {
-    options.displayMode = false;
+    const inlineOptions = { ...defaultOptions, displayMode: false };
     try {
       latex = latex
         .replace(/^\[(.*)\]$/, "$1")
         .replace(/^\\\((.*)\\\)$/, "$1")
         .replace(/^\\\[(.*)\\\]$/, "$1");
-      return katex.renderToString(latex, options);
+      return katex.renderToString(latex, inlineOptions);
     } catch (error) {
-      if (options.throwOnError) {
-        console.log(error);
-      }
-      return latex;
+      console.error('[KaTeX Inline Error]', error.message, 'LaTeX:', latex);
+      return `<span class="katex-error" style="color: #cc0000;">${latex}</span>`;
     }
   };
 
@@ -251,16 +256,14 @@ export default function math_plugin(md, options) {
   };
 
   var katexBlock = function (latex) {
-    options.displayMode = true;
+    const blockOptions = { ...defaultOptions, displayMode: true };
     try {
       // Remove surrounding delimiters if present
       latex = latex.replace(/^\[(.*)\]$/, "$1").replace(/^\\\[(.*)\\\]$/, "$1");
-      return "<p>" + katex.renderToString(latex, options) + "</p>";
+      return '<div class="katex-block">' + katex.renderToString(latex, blockOptions) + '</div>';
     } catch (error) {
-      if (options.throwOnError) {
-        console.log(error);
-      }
-      return latex;
+      console.error('[KaTeX Block Error]', error.message, 'LaTeX:', latex);
+      return `<div class="katex-error" style="color: #cc0000;">${latex}</div>`;
     }
   };
 
